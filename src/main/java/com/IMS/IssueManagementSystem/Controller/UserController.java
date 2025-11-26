@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -30,9 +31,10 @@ public class UserController {
     @Autowired
     private RoleService roleService;
 
+
     @PostMapping("/register")
     public ResponseEntity<UserDtos.RegisterResponse> registerUser(
-            @RequestBody UserDtos.RegisterRequest request) {
+            @Valid @RequestBody UserDtos.RegisterRequest request) {
 
         User user = new User();
         user.setUsername(request.getUsername());

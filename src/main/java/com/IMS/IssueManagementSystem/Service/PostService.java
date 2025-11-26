@@ -77,20 +77,6 @@ public class PostService {
         return new PostDtos.Response(200, "Post updated successfully", "SUCCESS", postResponse);
     }
 
-    public PostDtos.Response closePost(Long postId) {
-        Post post = postRepo.findById(postId)
-                .orElseThrow(() -> new RuntimeException("Post not found"));
-
-        if (post.getStatus() == PostStatus.CLOSED) {
-            throw new RuntimeException("Post is already closed");
-        }
-        post.setStatus(PostStatus.CLOSED);
-        post.setUpdatedAt(LocalDateTime.now());
-        postRepo.save(post);
-        PostDtos.PostResponse postResponse = convertToPostResponse(post);
-        return new PostDtos.Response(200, "Post closed successfully", "SUCCESS", postResponse);
-    }
-
     public PostDtos.Response deletePost(Long postId, Long userId) {
         Post post = postRepo.findById(postId)
                 .orElseThrow(() -> new RuntimeException("Post not found"));
@@ -101,6 +87,36 @@ public class PostService {
 
         postRepo.delete(post);
         return new PostDtos.Response(200, "Post deleted successfully","SUCCESS", null);
+    }
+
+    public PostDtos.Response submitApproval(Long userId, Long postId) {
+        User user = userRepo.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        Post post = postRepo.findById(postId)
+                .orElseThrow(() -> new RuntimeException("Post not found"));
+        if (!post.getCreatedBy().getId().equals(userId)) {
+            throw new RuntimeException("You are not authorized to submit this post.");
+        }
+        post.setStatus(PostStatus.PENDING_APPROVAL);
+        post.setUpdatedAt(LocalDateTime.now());
+        postRepo.save(post);
+        PostDtos.PostResponse postResponse = convertToPostResponse(post);
+        return new PostDtos.Response(200, "Post submitted successfully", "SUCCESS", postResponse);
+    }
+
+    public PostDtos.Response closePost(Long userId, Long postId) {
+        User user = userRepo.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        Post post = postRepo.findById(postId)
+                .orElseThrow(() -> new RuntimeException("Post not found"));
+        if (!post.getCreatedBy().getId().equals(userId)) {
+            throw new RuntimeException("You are not authorized to close this post.");
+        }
+        post.setStatus(PostStatus.CLOSED);
+        post.setUpdatedAt(LocalDateTime.now());
+        postRepo.save(post);
+        PostDtos.PostResponse postResponse = convertToPostResponse(post);
+        return new PostDtos.Response(200, "Post closed successfully", "SUCCESS", postResponse);
     }
 
     public List<PostDtos.PostResponse> getAllUserPosts(Long userId) {

@@ -35,7 +35,8 @@ public class SecurityConfig {
 
         http.authorizeHttpRequests(authorizeRequests -> authorizeRequests
                 .requestMatchers("/auth/register","/auth/login","/swagger-ui/**", "/v3/api-docs/**").permitAll()
-                .requestMatchers("api/admin/**").hasRole("ADMIN")
+                .requestMatchers("/api/admin/**").hasRole("ADMIN")
+                .requestMatchers("/api/admin/demote-to-user/**").hasRole("SUPER_ADMIN")
                 .anyRequest().authenticated()
         );
         http.exceptionHandling(httpSecurityExceptionHandlingConfigurer -> httpSecurityExceptionHandlingConfigurer

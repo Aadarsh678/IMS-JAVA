@@ -1,6 +1,7 @@
 package com.IMS.IssueManagementSystem.Controller;
 
 import com.IMS.IssueManagementSystem.DTO.PostDtos;
+import com.IMS.IssueManagementSystem.Model.User;
 import com.IMS.IssueManagementSystem.Model.UserPrincipal;
 import com.IMS.IssueManagementSystem.Service.PostService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,8 +32,15 @@ public class PostController {
     }
 
     @PutMapping("/close-post/{postId}")
-    public PostDtos.Response closePost(@PathVariable Long postId) {
-        return postService.closePost(postId);
+    public PostDtos.Response closePost(@PathVariable Long postId,@AuthenticationPrincipal UserPrincipal userPrincipal) {
+        Long userId = userPrincipal.getUserId();
+        return postService.closePost(userId,postId);
+    }
+
+    @PutMapping("/submit-post/{postId}")
+    public PostDtos.Response submitPost(@PathVariable Long postId,@AuthenticationPrincipal UserPrincipal userPrincipal) {
+        Long userId = userPrincipal.getUserId();
+        return postService.submitApproval(userId,postId);
     }
 
     // Delete a post

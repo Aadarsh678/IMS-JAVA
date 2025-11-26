@@ -10,8 +10,10 @@ import com.IMS.IssueManagementSystem.Repository.UserRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+
 import java.time.LocalDateTime;
-import java.util.Optional;
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 public class CommentService {
@@ -37,7 +39,7 @@ public class CommentService {
     }
 
     // Create a new comment
-    public CommentDtos.Response createComment(CommentDtos.CreateRequest createRequest, Long userId) {
+    public CommentDtos.Response createComment(CommentDtos.CreateCommentRequest createRequest, Long userId) {
         Post post = postRepo.findById(createRequest.getPostId())
                 .orElseThrow(() -> new RuntimeException("Post not found"));
 
@@ -57,9 +59,12 @@ public class CommentService {
     }
 
     // Update an existing comment
-    public CommentDtos.Response updateComment(Long commentId, CommentDtos.UpdateRequest updateRequest) {
+    public CommentDtos.Response updateComment(Long commentId, CommentDtos.UpdateCommentRequest updateRequest,Long userId) {
         Comment comment = commentRepo.findById(commentId)
                 .orElseThrow(() -> new RuntimeException("Comment not found"));
+        if(!comment.getCreatedBy().getId().equals(userId)) {
+            throw new RuntimeException("Cannot delete another users comment");
+        }
 
         comment.setText(updateRequest.getText());
         comment.setUpdatedDate(LocalDateTime.now());
@@ -80,16 +85,31 @@ public class CommentService {
     }
 
     // Delete a comment (soft delete by marking it as inactive)
-    public CommentDtos.Response deleteComment(Long commentId) {
+    public CommentDtos.Response deleteComment(Long commentId,Long userId) {
         Comment comment = commentRepo.findById(commentId)
                 .orElseThrow(() -> new RuntimeException("Comment not found"));
+        if (!comment.getCreatedBy().getId().equals(userId)) {
+            throw new RuntimeException("You are not authorized to delete this comment.");
+        }
+        commentRepo.delete(comment);
 
-        comment.setActive(false);
-        comment.setUpdatedDate(LocalDateTime.now());
+        return new CommentDtos.Response(200, "Comment deleted successfully", "SUCCESS",LocalDateTime.now());
+    }
 
-        Comment deletedComment = commentRepo.save(comment);
-        CommentDtos.CommentResponse commentResponse = convertToCommentResponse(deletedComment);
+    public CommentDtos.Response getAllCommentsByPost(Long postId) {
+        Post post = postRepo.findById(postId)
+                .orElseThrow(() -> new RuntimeException("Post not found"));
 
-        return new CommentDtos.Response(200, "Comment deleted successfully", "SUCCESS",LocalDateTime.now(), commentResponse);
+        // Fetch all comments related to the post
+        List<Comment> comments = commentRepo.findByPostId(postId);  // Use the correct method name
+        List<CommentDtos.CommentResponse> commentResponses = new ArrayList<>();
+
+        // Convert each comment to CommentResponse DTO
+        for (Comment comment : comments) {
+            commentResponses.add(convertToCommentResponse(comment));  // Use the helper method
+        }
+
+        // Return the response with the list of comments
+        return new CommentDtos.Response(200, "List of comments by Post", "SUCCESS", LocalDateTime.now(), commentResponses);
     }
 }
