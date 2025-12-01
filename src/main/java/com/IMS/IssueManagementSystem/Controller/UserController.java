@@ -23,7 +23,7 @@ import com.IMS.IssueManagementSystem.Service.RoleService;
 import com.IMS.IssueManagementSystem.Service.UserService;
 
 @RestController
-@RequestMapping(value="/auth")
+@RequestMapping(value="/api/Auth")
 public class UserController {
     @Autowired
     private UserService userService;
@@ -37,7 +37,7 @@ public class UserController {
             @Valid @RequestBody UserDtos.RegisterRequest request) {
 
         User user = new User();
-        user.setUsername(request.getUsername());
+        user.setUsername(request.getUserName());
         user.setPassword(request.getPassword());
         user.setEmail(request.getEmail());
         user.setContact(request.getContact());
@@ -85,7 +85,7 @@ public class UserController {
 
     @PostMapping("/login")
     public ResponseEntity<UserDtos.LoginResponse> login(@RequestBody UserDtos.LoginRequest request) {
-        User loggedInUser = userService.loginUser(request.getUsername(), request.getPassword());
+        User loggedInUser = userService.loginUser(request.getEmail(), request.getPassword());
 
         List<String> roleNames = loggedInUser.getRoles()
                 .stream()

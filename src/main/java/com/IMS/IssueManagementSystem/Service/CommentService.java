@@ -29,14 +29,25 @@ public class CommentService {
 
     // Helper method to convert Comment to CommentResponse DTO
     private CommentDtos.CommentResponse convertToCommentResponse(Comment comment) {
+        User user = comment.getCreatedBy();
+
+        // Create UserResponse for the createdBy field
+        CommentDtos.UserResponse userResponse = new CommentDtos.UserResponse(
+                user.getId(),
+                user.getUsername(),
+                user.getEmail(),
+                user.getContact()
+        );
+
         return new CommentDtos.CommentResponse(
                 comment.getId(),
                 comment.getText(),
                 comment.getPost().getId(),
-                comment.getCreatedBy().getUsername(),
+                userResponse,  // Use the UserResponse
                 comment.getCreatedDate()
         );
     }
+
 
     // Create a new comment
     public CommentDtos.Response createComment(CommentDtos.CreateCommentRequest createRequest, Long userId) {
@@ -47,7 +58,7 @@ public class CommentService {
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
         Comment comment = new Comment();
-        comment.setText(createRequest.getText());
+        comment.setText(createRequest.getContent());
         comment.setPost(post);
         comment.setCreatedBy(user);
         comment.setCreatedDate(LocalDateTime.now());
@@ -66,7 +77,7 @@ public class CommentService {
             throw new RuntimeException("Cannot delete another users comment");
         }
 
-        comment.setText(updateRequest.getText());
+        comment.setText(updateRequest.getContent());
         comment.setUpdatedDate(LocalDateTime.now());
 
         Comment updatedComment = commentRepo.save(comment);

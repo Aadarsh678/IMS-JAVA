@@ -1,10 +1,7 @@
 package com.IMS.IssueManagementSystem.DTO;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotEmpty;
-import jakarta.validation.constraints.Pattern;
-import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.Getter;
@@ -21,7 +18,7 @@ public class UserDtos {
     // Register request DTO
     @Data
     public static class RegisterRequest {
-        private String username;
+        private String userName;
         private String password;
         private String email;
         private String contact;
@@ -45,7 +42,7 @@ public class UserDtos {
         @AllArgsConstructor
         public static class Data {
             private Long id;
-            private String username;
+            private String userName;
             private String email;
             private List<String> roleNames;
             private String contact;
@@ -55,7 +52,7 @@ public class UserDtos {
     // Login request DTO
     @Data
     public static class LoginRequest {
-        private String username;
+        private String email;
         private String password;
     }
 
@@ -77,11 +74,23 @@ public class UserDtos {
         @AllArgsConstructor
         public static class Data {
             private Long id;
-            private String username;
+            private String userName;
             private String email;
             private List<String> roleNames;
             private String contact;
         }
+    }
+
+    @Data
+    @AllArgsConstructor
+    @Setter
+    @Getter
+    public static class UserListResponse {
+        private Long id;
+        private String userName;
+        private String email;
+        private List<String> roleNames;
+        private String contact;
     }
 
     @Data
@@ -91,5 +100,12 @@ public class UserDtos {
         private String message;
         private String status;
         private LocalDateTime timestamp;
+    }
+
+    @Data
+    @AllArgsConstructor
+    public static class ChangeUserRoleRequest {
+        @NotNull
+        private Long id;
     }
 }

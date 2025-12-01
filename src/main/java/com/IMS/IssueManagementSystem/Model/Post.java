@@ -2,8 +2,8 @@ package com.IMS.IssueManagementSystem.Model;
 import java.time.LocalDateTime;
 
 import com.IMS.IssueManagementSystem.Model.enums.PostStatus;
+import com.IMS.IssueManagementSystem.Model.enums.PostType;
 
-import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -39,12 +39,16 @@ public class Post {
     @Size(max = 2000, message = "Description cannot exceed 2000 characters")
     private String description;
 
-    // Ensure the PostStatus is not null when creating the post.
+    @NotNull(message = "Post type must not be null")
+    @Enumerated(EnumType.STRING)
+    private PostType postType;
+
+    // EPostStatus is not null when creating the post.
     @NotNull(message = "Post status must not be null")
     @Enumerated(EnumType.STRING)
     private PostStatus status = PostStatus.DRAFT;
 
-    // Ensure the isActive flag is a boolean value and is set to true by default.
+    // isActive flag is a boolean value and is set to true by default.
     private boolean isActive = true;
 
     // Validate that the User who created the post is not null.
@@ -53,7 +57,7 @@ public class Post {
     @NotNull(message = "Creator (user) must not be null")
     private User createdBy;
 
-    // Ensure the createdAt timestamp is not null.
+    // createdAt timestamp is not null.
     private LocalDateTime createdAt = LocalDateTime.now();
 
     // Validate the updatedAt timestamp for consistency.

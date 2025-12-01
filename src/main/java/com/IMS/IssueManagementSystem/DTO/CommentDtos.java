@@ -8,23 +8,39 @@ import java.util.List;
 
 public class CommentDtos {
     @Data
+    public static class UserResponse {
+        private Long id;
+        private String username;
+        private String email;
+        private String contact;
+
+        // Constructor for UserResponse
+        public UserResponse(Long id, String username, String email, String contact) {
+            this.id = id;
+            this.username = username;
+            this.email = email;
+            this.contact = contact;
+        }
+    }
+
+    @Data
     public static class CreateCommentRequest {
         private Long postId;
-        private String text;
+        private String content;
     }
 
     @Data
     public static class UpdateCommentRequest {
-        private String text;
+        private String content;
     }
 
     @AllArgsConstructor
     @Data
     public static class CommentResponse {
         private Long id;
-        private String text;
+        private String content;
         private Long postId;
-        private String createdBy;
+        private UserResponse createdBy;
         private LocalDateTime createdAt;
     }
 

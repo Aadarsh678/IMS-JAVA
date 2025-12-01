@@ -32,11 +32,12 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain configure(HttpSecurity http) throws Exception {
         http.csrf(csrf -> csrf.disable());
+        http.cors(Customizer.withDefaults());
 
         http.authorizeHttpRequests(authorizeRequests -> authorizeRequests
-                .requestMatchers("/auth/register","/auth/login","/swagger-ui/**", "/v3/api-docs/**").permitAll()
-                .requestMatchers("/api/admin/**").hasRole("ADMIN")
-                .requestMatchers("/api/admin/demote-to-user/**").hasRole("SUPER_ADMIN")
+                .requestMatchers("/api/Auth/register","/api/Auth/login","/swagger-ui/**", "/v3/api-docs/**").permitAll()
+                .requestMatchers("/api/Admin/**").hasRole("ADMIN")
+                .requestMatchers("/api/Admin/demote-to-user/**").hasRole("SUPER_ADMIN")
                 .anyRequest().authenticated()
         );
         http.exceptionHandling(httpSecurityExceptionHandlingConfigurer -> httpSecurityExceptionHandlingConfigurer

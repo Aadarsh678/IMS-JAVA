@@ -17,7 +17,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/comment")
+@RequestMapping("/api/Comment")
 public class CommentController {
 
     @Autowired
@@ -34,7 +34,7 @@ public class CommentController {
         return commentService.getAllCommentsByPost(postId);
     }
 
-    @PostMapping("/add-comment")
+    @PostMapping
     public CommentDtos.Response addComment(
             @RequestBody CommentDtos.CreateCommentRequest createCommentRequest,
             @AuthenticationPrincipal UserPrincipal userPrincipal) {
@@ -44,19 +44,19 @@ public class CommentController {
         return commentService.createComment(createCommentRequest, userId);
     }
 
-    @PutMapping("/update-comment/{commentId}")
-    public CommentDtos.Response updateComment(@PathVariable Long commentId,
+    @PutMapping("/{id}")
+    public CommentDtos.Response updateComment(@PathVariable Long id,
             @RequestBody CommentDtos.UpdateCommentRequest updateCommentRequest,
                                               @AuthenticationPrincipal UserPrincipal userPrincipal
     ){
         Long userId = userPrincipal.getUserId();
-        return commentService.updateComment(commentId,updateCommentRequest,userId);
+        return commentService.updateComment(id,updateCommentRequest,userId);
     }
 
-    @DeleteMapping("/delete-comment/{commentId}")
-    public CommentDtos.Response deleteComment(@PathVariable Long commentId,@AuthenticationPrincipal UserPrincipal userPrincipal) {
+    @DeleteMapping("/{id}")
+    public CommentDtos.Response deleteComment(@PathVariable Long id,@AuthenticationPrincipal UserPrincipal userPrincipal) {
        Long userId = userPrincipal.getUserId();
-        return commentService.deleteComment(commentId,userId);
+        return commentService.deleteComment(id,userId);
     }
 
 

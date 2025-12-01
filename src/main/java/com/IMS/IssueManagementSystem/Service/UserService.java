@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -37,6 +38,22 @@ public class UserService {
 
 
     public User registerUser(User user) {
+        if (userRepo.findByEmail(user.getEmail()) != null) {
+        throw new RuntimeException("Email already exists!");
+        }
+
+        // Check if username already exists
+        if (userRepo.findByUsername(user.getUsername()) != null) {
+            throw new RuntimeException("Username already exists!");
+        }
+
+        // Check if contact exists (optional)
+        if (user.getContact() != null && !user.getContact().isEmpty()) {
+            User existingContact = userRepo.findByContact(user.getContact());
+            if (existingContact != null) {
+                throw new RuntimeException("Contact number already exists!");
+            }
+        }
         List<Role> roles = new ArrayList<>();
         for(Role role : user.getRoles()) {
             Role existingRole = roleRepo.findByName(role.getName());
@@ -52,11 +69,11 @@ public class UserService {
         return user;
     }
 
-    public User loginUser(String username, String password) {
+    public User loginUser(String email, String password) {
         authenticationManager.
-                authenticate(new UsernamePasswordAuthenticationToken(username, password)
+                authenticate(new UsernamePasswordAuthenticationToken(email, password)
         );
-        return  userRepo.findByUsername(username);
+        return  userRepo.findByEmail(email);
     }
 
 
@@ -107,10 +124,10 @@ public class UserService {
         return userRepo.save(existingUser);
     }
 
-    public UserDtos.PromoteResponse promoteUserToAdmin(Long userId) {
-        User user = getUserById(userId);
+    public UserDtos.PromoteResponse promoteUserToAdmin(UserDtos.ChangeUserRoleRequest request) {
+        User user = getUserById(request.getId());
         if(user == null) {
-            throw new RuntimeException("User not found with id: " + userId);
+            throw new RuntimeException("User not found with id: " + request.getId());
         }
         Role adminRole = roleRepo.findByName("ADMIN");
         if (adminRole == null) {
@@ -133,10 +150,10 @@ public class UserService {
     }
 
 
-    public UserDtos.PromoteResponse demoteAdminToUser(Long userId,Long currentuserId){
-        User user = getUserById(userId);
+    public UserDtos.PromoteResponse demoteAdminToUser(UserDtos.ChangeUserRoleRequest request,Long currentuserId){
+        User user = getUserById(request.getId());
         User currentUser = getUserById(currentuserId);
-        if (currentUser.getId().equals(userId)) {
+        if (currentUser.getId().equals(request.getId())) {
             throw new RuntimeException("Admin cannot demote themselves");
         }
         Role adminRole = roleRepo.findByName("ADMIN");
@@ -157,4 +174,6 @@ public class UserService {
         }else {
             throw new RuntimeException("User is not an admin");
         }}
+
+
 }
