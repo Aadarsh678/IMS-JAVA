@@ -11,6 +11,7 @@ import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -23,7 +24,8 @@ import com.IMS.IssueManagementSystem.Service.RoleService;
 import com.IMS.IssueManagementSystem.Service.UserService;
 
 @RestController
-@RequestMapping(value="/api/Auth")
+@RequestMapping(value="/api/auth")
+@Validated
 public class UserController {
     @Autowired
     private UserService userService;
@@ -34,7 +36,7 @@ public class UserController {
 
     @PostMapping("/register")
     public ResponseEntity<UserDtos.RegisterResponse> registerUser(
-            @Valid @RequestBody UserDtos.RegisterRequest request) {
+            @RequestBody @Valid UserDtos.RegisterRequest request) {
 
         User user = new User();
         user.setUsername(request.getUserName());
@@ -84,7 +86,7 @@ public class UserController {
 
 
     @PostMapping("/login")
-    public ResponseEntity<UserDtos.LoginResponse> login(@RequestBody UserDtos.LoginRequest request) {
+    public ResponseEntity<UserDtos.LoginResponse> login(@Valid @RequestBody UserDtos.LoginRequest request) {
         User loggedInUser = userService.loginUser(request.getEmail(), request.getPassword());
 
         List<String> roleNames = loggedInUser.getRoles()

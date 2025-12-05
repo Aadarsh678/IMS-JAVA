@@ -1,6 +1,7 @@
 package com.IMS.IssueManagementSystem.Exception;
 import com.IMS.IssueManagementSystem.Utils.ApiResponseBuilder;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import io.swagger.v3.oas.annotations.Hidden;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.ConstraintViolationException;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -16,6 +17,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+@Hidden
 @RestControllerAdvice
 public class GenericExceptionHandler {
     @ExceptionHandler(Exception.class)

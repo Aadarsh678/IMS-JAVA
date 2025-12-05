@@ -3,6 +3,7 @@ package com.IMS.IssueManagementSystem.DTO;
 import com.IMS.IssueManagementSystem.Model.enums.PostType;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -36,15 +37,25 @@ public class PostDtos {
 
     @Data
     public static class CreateRequest {
+        @NotEmpty(message = "PostType must not be empty.")
         private PostType postType;
+        @NotEmpty(message = "Title must not be empty.")
+        @Size(min = 5, max = 100, message = "Title must be between 5 and 100 characters")
         private String title;
+        @NotEmpty(message = "Description must not be empty")
+        @Size(max = 2000, message = "Description cannot exceed 2000 characters")
         private String description;
     }
 
     @Data
     public static class UpdateRequest {
+        @NotEmpty(message = "PostType must not be empty.")
         private PostType postType;
+        @NotEmpty(message = "Title must not be empty")
+        @Size(min = 5, max = 100, message = "Title must be between 5 and 100 characters")
         private String title;
+        @NotEmpty(message = "Description must not be empty")
+        @Size(max = 2000, message = "Description cannot exceed 2000 characters")
         private String description;
     }
 

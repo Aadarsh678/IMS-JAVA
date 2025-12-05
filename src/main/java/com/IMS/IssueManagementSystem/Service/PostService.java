@@ -7,7 +7,9 @@ import com.IMS.IssueManagementSystem.Model.enums.PostStatus;
 import com.IMS.IssueManagementSystem.Model.enums.PostType;
 import com.IMS.IssueManagementSystem.Repository.PostRepo;
 import com.IMS.IssueManagementSystem.Repository.UserRepo;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -45,7 +47,7 @@ public class PostService {
 
     public PostDtos.Response createPost(PostDtos.CreateRequest request, Long userId) {
         User user = userRepo.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new EntityNotFoundException("User not found"));
 
         Post post = new Post();
         post.setTitle(request.getTitle());
@@ -67,7 +69,7 @@ public class PostService {
                 .orElseThrow(() -> new RuntimeException("Post not found"));
 
         if (!post.getCreatedBy().getId().equals(userId)) {
-            throw new RuntimeException("You are not authorized to update this post.");
+            throw new AccessDeniedException("You are not authorized to update this post.");
         }
         post.setPostType(PostType.valueOf(newPostType));
         post.setTitle(newTitle);
@@ -82,10 +84,10 @@ public class PostService {
 
     public PostDtos.Response deletePost(Long postId, Long userId) {
         Post post = postRepo.findById(postId)
-                .orElseThrow(() -> new RuntimeException("Post not found"));
+                .orElseThrow(() -> new EntityNotFoundException("Post not found"));
 
         if (!post.getCreatedBy().getId().equals(userId)) {
-            throw new RuntimeException("You are not authorized to delete this post.");
+            throw new AccessDeniedException("You are not authorized to delete this post.");
         }
 
         postRepo.delete(post);
@@ -94,11 +96,11 @@ public class PostService {
 
     public PostDtos.Response submitApproval(Long userId,PostDtos.ChangePostStatusRequest request) {
         User user = userRepo.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new EntityNotFoundException("User not found"));
         Post post = postRepo.findById(request.getId())
-                .orElseThrow(() -> new RuntimeException("Post not found"));
+                .orElseThrow(() -> new EntityNotFoundException("Post not found"));
         if (!post.getCreatedBy().getId().equals(userId)) {
-            throw new RuntimeException("You are not authorized to submit this post.");
+            throw new AccessDeniedException("You are not authorized to submit this post.");
         }
         post.setStatus(PostStatus.PENDING_APPROVAL);
         post.setUpdatedAt(LocalDateTime.now());
@@ -109,10 +111,10 @@ public class PostService {
 
     public PostDtos.Response findPostById(Long postId, Long userId) {
         Post post = postRepo.findById(postId)
-                .orElseThrow(() -> new RuntimeException("Post not found"));
+                .orElseThrow(() -> new EntityNotFoundException("Post not found"));
 
         if (!post.getCreatedBy().getId().equals(userId)) {
-            throw new RuntimeException("You are not authorized to view this post.");
+            throw new AccessDeniedException("You are not authorized to view this post.");
         }
 
         PostDtos.PostResponse postResponse = convertToPostResponse(post);
@@ -121,11 +123,11 @@ public class PostService {
 
     public PostDtos.Response closePost(Long userId,PostDtos.ChangePostStatusRequest request) {
         User user = userRepo.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new EntityNotFoundException("User not found"));
         Post post = postRepo.findById(request.getId())
-                .orElseThrow(() -> new RuntimeException("Post not found"));
+                .orElseThrow(() -> new EntityNotFoundException("Post not found"));
         if (!post.getCreatedBy().getId().equals(userId)) {
-            throw new RuntimeException("You are not authorized to close this post.");
+            throw new AccessDeniedException("You are not authorized to close this post.");
         }
         post.setStatus(PostStatus.CLOSED);
         post.setUpdatedAt(LocalDateTime.now());
@@ -158,7 +160,7 @@ public class PostService {
     public List<PostDtos.PostResponse> getApprovedPostsByUser(Long targetUserId) {
         List<Post> posts;
         User user = userRepo.findById(targetUserId)
-            .orElseThrow(() -> new RuntimeException("User not found"));
+            .orElseThrow(() -> new EntityNotFoundException("User not found"));
         posts = postRepo.findByCreatedByIdAndStatus(targetUserId, PostStatus.APPROVED);
 
         return convertToPostResponseList(posts);
@@ -198,7 +200,7 @@ public class PostService {
 
     public List<PostDtos.PostResponse> getSubmittedPostsByUser(Long userId, PostType postType) {
         User user = userRepo.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new EntityNotFoundException("User not found"));
 
         List<Post> posts;
 

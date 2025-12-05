@@ -35,9 +35,9 @@ public class SecurityConfig {
         http.cors(Customizer.withDefaults());
 
         http.authorizeHttpRequests(authorizeRequests -> authorizeRequests
-                .requestMatchers("/api/Auth/register","/api/Auth/login","/swagger-ui/**", "/v3/api-docs/**").permitAll()
-                .requestMatchers("/api/Admin/**").hasRole("ADMIN")
-                .requestMatchers("/api/Admin/demote-to-user/**").hasRole("SUPER_ADMIN")
+                .requestMatchers("/api/auth/register","/api/auth/login","/swagger-ui/**", "/v3/api-docs/**").permitAll()
+                .requestMatchers("/api/admin/**").hasAnyRole("ADMIN","SUPER_ADMIN")
+                .requestMatchers("/api/admin/demote-to-user/**").hasRole("SUPER_ADMIN")
                 .anyRequest().authenticated()
         );
         http.exceptionHandling(httpSecurityExceptionHandlingConfigurer -> httpSecurityExceptionHandlingConfigurer

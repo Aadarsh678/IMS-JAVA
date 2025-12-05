@@ -9,6 +9,7 @@ import com.IMS.IssueManagementSystem.Model.enums.PostStatus;
 import com.IMS.IssueManagementSystem.Model.enums.UserRole;
 import com.IMS.IssueManagementSystem.Repository.PostRepo;
 import com.IMS.IssueManagementSystem.Repository.UserRepo;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -47,7 +48,7 @@ public class AdminService {
 
     public PostDtos.Response approvePost(PostDtos.ChangePostStatusRequest request) {
         Post post = postRepo.findById(request.getId())
-                .orElseThrow(() -> new RuntimeException("Post not found"));
+                .orElseThrow(() -> new EntityNotFoundException("Post not found"));
 
         if(post.getStatus() == PostStatus.APPROVED) {
             throw new RuntimeException("Post is already approved");
@@ -67,7 +68,7 @@ public class AdminService {
 
     public PostDtos.Response rejectPost(PostDtos.ChangePostStatusRequest request) {
         Post post = postRepo.findById(request.getId())
-                .orElseThrow(() -> new RuntimeException("Post not found"));
+                .orElseThrow(() -> new EntityNotFoundException("Post not found"));
         if(post.getStatus() == PostStatus.REJECTED) {
             throw new RuntimeException("Post is already rejected");
         }

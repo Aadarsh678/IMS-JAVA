@@ -5,8 +5,10 @@ import com.IMS.IssueManagementSystem.Model.User;
 import com.IMS.IssueManagementSystem.Model.Role;
 import com.IMS.IssueManagementSystem.Repository.RoleRepo;
 import com.IMS.IssueManagementSystem.Repository.UserRepo;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -39,19 +41,19 @@ public class UserService {
 
     public User registerUser(User user) {
         if (userRepo.findByEmail(user.getEmail()) != null) {
-        throw new RuntimeException("Email already exists!");
+        throw new DataIntegrityViolationException("Email already exists!");
         }
 
         // Check if username already exists
         if (userRepo.findByUsername(user.getUsername()) != null) {
-            throw new RuntimeException("Username already exists!");
+            throw new DataIntegrityViolationException("Username already exists!");
         }
 
         // Check if contact exists (optional)
         if (user.getContact() != null && !user.getContact().isEmpty()) {
             User existingContact = userRepo.findByContact(user.getContact());
             if (existingContact != null) {
-                throw new RuntimeException("Contact number already exists!");
+                throw new DataIntegrityViolationException("Contact number already exists!");
             }
         }
         List<Role> roles = new ArrayList<>();
@@ -59,10 +61,11 @@ public class UserService {
             Role existingRole = roleRepo.findByName(role.getName());
 
             if(existingRole == null) {
-                throw new RuntimeException("Role not found: " + role.getName());
+                throw new EntityNotFoundException("Role not found.");
             }
             roles.add(existingRole);
         }
+
         user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
         user.setRoles(new HashSet<>(roles));
         userRepo.save(user);
@@ -83,12 +86,12 @@ public class UserService {
 
     public User getUserById(Long id) {
         return userRepo.findById(id)
-                .orElseThrow(() -> new RuntimeException("User not found with id: " + id));
+                .orElseThrow(() -> new EntityNotFoundException("User not found."));
     }
 
     public void deleteUser(Long id) {
         if (!userRepo.existsById(id)) {
-            throw new RuntimeException("User not found with id: " + id);
+            throw new EntityNotFoundException("User not found.");
         }
         userRepo.deleteById(id);
     }
@@ -127,11 +130,11 @@ public class UserService {
     public UserDtos.PromoteResponse promoteUserToAdmin(UserDtos.ChangeUserRoleRequest request) {
         User user = getUserById(request.getId());
         if(user == null) {
-            throw new RuntimeException("User not found with id: " + request.getId());
+            throw new EntityNotFoundException("User not found.");
         }
         Role adminRole = roleRepo.findByName("ADMIN");
         if (adminRole == null) {
-            throw new RuntimeException("Role 'ADMIN' not found in the database");
+            throw new EntityNotFoundException("Role 'ADMIN' not found in the database");
         }
         if (!user.getRoles().contains(adminRole)) {
             user.getRoles().add(adminRole);
@@ -158,7 +161,7 @@ public class UserService {
         }
         Role adminRole = roleRepo.findByName("ADMIN");
         if (adminRole == null) {
-            throw new RuntimeException("Role 'ADMIN' not found in the database");
+            throw new EntityNotFoundException("Role 'ADMIN' not found in the database");
         }
         if (user.getRoles().contains(adminRole)) {
             user.getRoles().remove(adminRole);

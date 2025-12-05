@@ -7,7 +7,9 @@ import com.IMS.IssueManagementSystem.Model.User;
 import com.IMS.IssueManagementSystem.Repository.CommentRepo;
 import com.IMS.IssueManagementSystem.Repository.PostRepo;
 import com.IMS.IssueManagementSystem.Repository.UserRepo;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
 
@@ -52,10 +54,10 @@ public class CommentService {
     // Create a new comment
     public CommentDtos.Response createComment(CommentDtos.CreateCommentRequest createRequest, Long userId) {
         Post post = postRepo.findById(createRequest.getPostId())
-                .orElseThrow(() -> new RuntimeException("Post not found"));
+                .orElseThrow(() -> new EntityNotFoundException("Post not found"));
 
         User user = userRepo.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new EntityNotFoundException("User not found"));
 
         Comment comment = new Comment();
         comment.setText(createRequest.getContent());
@@ -72,9 +74,9 @@ public class CommentService {
     // Update an existing comment
     public CommentDtos.Response updateComment(Long commentId, CommentDtos.UpdateCommentRequest updateRequest,Long userId) {
         Comment comment = commentRepo.findById(commentId)
-                .orElseThrow(() -> new RuntimeException("Comment not found"));
+                .orElseThrow(() -> new EntityNotFoundException("Comment not found"));
         if(!comment.getCreatedBy().getId().equals(userId)) {
-            throw new RuntimeException("Cannot delete another users comment");
+            throw new AccessDeniedException("Cannot delete another users comment");
         }
 
         comment.setText(updateRequest.getContent());
@@ -89,7 +91,7 @@ public class CommentService {
     // Get a comment by ID
     public CommentDtos.Response getCommentById(Long commentId) {
         Comment comment = commentRepo.findById(commentId)
-                .orElseThrow(() -> new RuntimeException("Comment not found"));
+                .orElseThrow(() -> new EntityNotFoundException("Comment not found"));
 
         CommentDtos.CommentResponse commentResponse = convertToCommentResponse(comment);
         return new CommentDtos.Response(200, "Comment retrieved successfully", "SUCCESS",LocalDateTime.now(), commentResponse);
@@ -98,9 +100,9 @@ public class CommentService {
     // Delete a comment (soft delete by marking it as inactive)
     public CommentDtos.Response deleteComment(Long commentId,Long userId) {
         Comment comment = commentRepo.findById(commentId)
-                .orElseThrow(() -> new RuntimeException("Comment not found"));
+                .orElseThrow(() -> new EntityNotFoundException("Comment not found"));
         if (!comment.getCreatedBy().getId().equals(userId)) {
-            throw new RuntimeException("You are not authorized to delete this comment.");
+            throw new AccessDeniedException("You are not authorized to delete this comment.");
         }
         commentRepo.delete(comment);
 
@@ -109,15 +111,15 @@ public class CommentService {
 
     public CommentDtos.Response getAllCommentsByPost(Long postId) {
         Post post = postRepo.findById(postId)
-                .orElseThrow(() -> new RuntimeException("Post not found"));
+                .orElseThrow(() -> new EntityNotFoundException("Post not found"));
 
         // Fetch all comments related to the post
-        List<Comment> comments = commentRepo.findByPostId(postId);  // Use the correct method name
+        List<Comment> comments = commentRepo.findByPostId(postId);
         List<CommentDtos.CommentResponse> commentResponses = new ArrayList<>();
 
         // Convert each comment to CommentResponse DTO
         for (Comment comment : comments) {
-            commentResponses.add(convertToCommentResponse(comment));  // Use the helper method
+            commentResponses.add(convertToCommentResponse(comment));
         }
 
         // Return the response with the list of comments

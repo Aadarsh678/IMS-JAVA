@@ -15,7 +15,7 @@ import com.IMS.IssueManagementSystem.Service.UserService;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/Admin")
+@RequestMapping("/api/admin")
 public class AdminController {
 
     @Autowired

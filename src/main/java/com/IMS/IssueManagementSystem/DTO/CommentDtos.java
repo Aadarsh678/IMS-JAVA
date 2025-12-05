@@ -1,5 +1,6 @@
 package com.IMS.IssueManagementSystem.DTO;
 
+import jakarta.validation.constraints.NotEmpty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
@@ -25,12 +26,15 @@ public class CommentDtos {
 
     @Data
     public static class CreateCommentRequest {
+        @NotEmpty(message = "postId must not be empty")
         private Long postId;
+        @NotEmpty(message = "Comment text must not be empty")
         private String content;
     }
 
     @Data
     public static class UpdateCommentRequest {
+        @NotEmpty(message = "Comment text must not be empty")
         private String content;
     }
 
