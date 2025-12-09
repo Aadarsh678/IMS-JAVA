@@ -1,0 +1,11 @@
+customer_id,first_name,last_name,email,city,updated_at
+100,James,Smith,james.smith@example.com,New York,2025-12-07 17:30:00
+101,Maria,Garcia,m.garcia88@testmail.com,Los Angeles,2025-12-07 17:30:00
+102,Robert,Johnson,rob.johnson@workplace.org,Houston,2025-12-08 17:30:00
+103,Sarah,Miller,sarah.miller.dev@example.net,San Francisco,2025-12-07 17:30:00
+104,Michael,Davis,mdavis1990@example.com,Austin,2025-12-07 17:30:00
+105,Jennifer,Wilson,jen.wilson@testmail.com,Seattle,2025-12-07 17:30:00
+106,William,Moore,w.moore@finance.org,Boston,2025-12-07 17:30:00
+107,Elizabeth,Taylor,liz.taylor@design.net,Denver,2025-12-07 17:30:00
+108,David,Anderson,d.anderson@example.com,Miami,2025-12-07 17:30:00
+109,Lisa,Thomas,lisa.thomas@testmail.com,Atlanta,2025-12-07 17:30:00
